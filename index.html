@@ -66,6 +66,32 @@
     <label class="btn">정답 파일 고르기 (.csv · .xlsx)<input id="answerFile" type="file" accept=".csv,.xlsx" hidden></label>
     <div id="compareOut"></div>
   </section>
+
+  <section id="s6" hidden>
+    <h2><span class="n">6</span> 접속 분석 — 그래프</h2>
+    <p class="info">정리한 표로 시간대 · 부서 · 요일 · 일자 · 유저별 접속량을 셉니다. 읽지 못한 값은 지어내지 않고 «뺀 줄»로 알립니다. 정리 전후를 바꿔 가며 견줄 수 있습니다.</p>
+    <div class="controls">
+      <fieldset class="seg">
+        <legend>그래프에 쓸 표</legend>
+        <label><input type="radio" name="anaTable" value="clean" checked> 정리본</label>
+        <label><input type="radio" name="anaTable" value="raw"> 원본 그대로</label>
+      </fieldset>
+      <label class="sel">묶어서 볼 칸
+        <select id="anaGroup"></select>
+      </label>
+    </div>
+    <div id="anaStats" class="stats"></div>
+    <p id="anaNote" class="info"></p>
+    <div id="anaExcluded" class="warn" hidden></div>
+    <div class="charts">
+      <div id="chHour" class="chartbox"></div>
+      <div id="chGroup" class="chartbox"></div>
+      <div id="chWeek" class="chartbox"></div>
+      <div id="chUser" class="chartbox"></div>
+    </div>
+    <div id="chDaily" class="chartbox wide"></div>
+    <div id="chHeat" class="chartbox wide"></div>
+  </section>
 </main>
 
 <footer>
@@ -74,6 +100,8 @@
 
 <script src="lib/xlsx.full.min.js"></script>
 <script src="clean.js"></script>
+<script src="analyze.js"></script>
+<script src="charts.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

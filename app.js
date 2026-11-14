@@ -69,7 +69,7 @@
     state.fileName = file.name;
     state.baseName = file.name.replace(/\.[^.]+$/, '');
     state.result = null;
-    show('s3', false); show('s4', false); show('s5', false);
+    show('s3', false); show('s4', false); show('s5', false); show('s6', false);
     readTable(file).then(function (res) {
       state.table = res.table;
       var info = state.fileName + ' — 줄 ' + res.table.rows.length + ' · 칸 ' + res.table.header.length +
@@ -168,6 +168,7 @@
       res.marks.slice(0, 20).map(function (e) { return [String(e.src), fmt(e.key), e.col, e.after, e.rule, e.why]; }),
       '표시한 행이 없습니다.');
     show('s3', true); show('s4', true); show('s5', true);
+    setupAnalysis();
     $('compareOut').textContent = '';
   }
 
@@ -235,6 +236,60 @@
     }).catch(function (e) { out.appendChild(el('p', '정답 파일을 읽지 못했습니다: ' + e.message, 'warn')); });
   }
 
+  /* ---------- 6. 접속 분석 (그래프) ---------- */
+  function rawTable() { return { header: state.table.header, rows: state.table.rows }; }
+
+  function setupAnalysis() {
+    var cfg = state.rules && state.rules.analysis;
+    if (!cfg) { show('s6', false); return; }
+    var sel = $('anaGroup'); clear(sel);
+    var choices = (cfg.group_choices || [cfg.group_column]).filter(function (c) { return state.table.header.indexOf(c) >= 0; });
+    if (!choices.length) choices = [cfg.group_column];
+    choices.forEach(function (c) {
+      var o = el('option', c); o.value = c; if (c === cfg.group_column) o.selected = true; sel.appendChild(o);
+    });
+    show('s6', true);
+    renderAnalysis();
+  }
+
+  function renderAnalysis() {
+    var cfg = state.rules && state.rules.analysis;
+    if (!cfg || !state.result) return;
+    var group = $('anaGroup').value || cfg.group_column;
+    var rawA = Analyzer.analyze(rawTable(), cfg, group);
+    var cleanA = Analyzer.analyze({ header: state.result.header, rows: state.result.rows }, cfg, group);
+    var which = document.querySelector('input[name="anaTable"]:checked').value;
+    var a = which === 'raw' ? rawA : cleanA;
+    var nf = function (n) { return n.toLocaleString('ko-KR'); };
+
+    var box = $('anaStats'); clear(box);
+    box.appendChild(stat('그래프에 쓴 줄', nf(a.used) + ' / ' + nf(a.total)));
+    box.appendChild(stat('서로 다른 유저', a.userKinds == null ? '—' : a.userKinds + '명'));
+    box.appendChild(stat('평균 접속시간', a.avgMin == null ? '—' : a.avgMin.toFixed(1) + '분', '튀는 값 · 못 읽은 값은 뺌'));
+    box.appendChild(stat('접속이 가장 많은 시간대', a.peakHour == null ? '—' : (a.peakHour < 10 ? '0' : '') + a.peakHour + '시'));
+    box.appendChild(stat('가장 많은 ' + a.groupName, a.topGroup ? a.topGroup.name : '—', a.topGroup ? nf(a.topGroup.count) + '건' : ''));
+
+    $('anaNote').textContent = a.groupName + ' 이름: 원본 ' + rawA.groupKinds + '가지 → 정리본 ' + cleanA.groupKinds +
+      '가지 · 그래프에 쓴 줄: 원본 ' + nf(rawA.used) + ' → 정리본 ' + nf(cleanA.used);
+
+    var ex = $('anaExcluded'); clear(ex);
+    var keys = Object.keys(a.excluded);
+    if (keys.length) {
+      ex.appendChild(el('p', '그래프에서 뺀 줄 — ' + keys.map(function (k) { return k + ' ' + nf(a.excluded[k]) + '줄'; }).join(' · ')));
+      show('anaExcluded', true);
+    } else show('anaExcluded', false);
+
+    var hours = a.hourly.map(function (c, h) { return { name: (h < 10 ? '0' : '') + h, count: c }; });
+    Charts.bars($('chHour'), '시간대별 접속 건수 (시)', hours, { note: '접속 시각의 시 기준' });
+    Charts.hbars($('chGroup'), a.groupName + '별 접속 건수' + (a.groups.length > 12 ? ' (상위 12개)' : ''), a.groups.slice(0, 12).map(function (g) {
+      return { name: g.name, count: g.count, extra: g.avgMin == null ? '' : '평균 ' + g.avgMin.toFixed(1) + '분' };
+    }), { note: '큰 순서' });
+    Charts.bars($('chWeek'), '요일별 접속 건수', Analyzer.DAYS.map(function (d, i) { return { name: d, count: a.weekday[i] }; }));
+    Charts.hbars($('chUser'), '접속이 많은 유저 10명', a.topUsers);
+    Charts.line($('chDaily'), '일자별 접속 건수', a.daily, { W: 900 });
+    Charts.heatmap($('chHeat'), '요일 × 시간대 접속 건수 (진할수록 많음)', Analyzer.DAYS, a.heat, { W: 900 });
+  }
+
   /* ---------- 연결 ---------- */
   var drop = $('drop');
   ['dragenter', 'dragover'].forEach(function (ev) {
@@ -258,6 +313,8 @@
   $('dlClean').addEventListener('click', downloadClean);
   $('dlLog').addEventListener('click', downloadLog);
   $('answerFile').addEventListener('change', function (e) { onAnswer(e.target.files[0]); });
+  $('anaGroup').addEventListener('change', renderAnalysis);
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="anaTable"]'), function (r) { r.addEventListener('change', renderAnalysis); });
   window.addEventListener('dragover', function (e) { e.preventDefault(); });
   window.addEventListener('drop', function (e) { e.preventDefault(); });
 

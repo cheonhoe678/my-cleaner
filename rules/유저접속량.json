@@ -2,6 +2,17 @@
   "file": "유저접속량.xlsx",
   "owner": "김천회",
   "key_column": "Logid",
+  "analysis": {
+    "time_column": "로그인시간",
+    "date_column": "접속일자",
+    "group_column": "부서",
+    "minutes_column": "접속시간",
+    "user_column": "userid",
+    "group_choices": ["부서"],
+    "minutes_valid_above": 0,
+    "minutes_valid_below": 1440,
+    "date_window_days": 120
+  },
   "order_note": "위에서 아래로 적용한다. 모양을 먼저 맞추고(R1~R8), 표시(R9~R12)를 한 뒤, 마지막에 같은 줄을 지운다(R13). type 은 정리기가 아는 동작의 이름이고, 값(칸 이름 · 바꿀 말 · 경계)은 모두 이 파일에서 읽는다.",
   "rules": [
     {

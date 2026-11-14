@@ -44,3 +44,22 @@ td.num{text-align:right}
 footer{padding:0 16px 40px;font-size:13px;color:var(--muted)}
 code{font-family:Consolas,"Malgun Gothic",monospace;background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:0 4px}
 @media (max-width:600px){section{padding:16px}h1{font-size:23px}}
+
+/* 그래프 */
+.controls{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;margin:10px 0 14px}
+.seg{border:1px solid var(--line);border-radius:8px;padding:4px 12px 8px;margin:0}
+.seg legend{font-size:13px;color:var(--muted);padding:0 4px}
+.seg label{margin-right:12px;cursor:pointer}
+.sel{display:flex;flex-direction:column;font-size:13px;color:var(--muted);gap:2px}
+.sel select{font:inherit;font-size:15px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px;margin:14px 0}
+.chartbox{border:1px solid var(--line);border-radius:10px;padding:10px 14px 6px;background:var(--paper);min-width:0}
+.chartbox.wide{margin:14px 0}
+.ctitle{font-size:15px;margin:2px 0 6px}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--ink2);font-size:13px}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .bar{fill:var(--accent)}
+.chart .heat{fill:var(--accent)}
+.chart .lineP{fill:none;stroke:var(--accent);stroke-width:2}
+.chart .dot{fill:var(--accent)}
