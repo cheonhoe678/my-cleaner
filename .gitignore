@@ -1,0 +1,8 @@
+# 어디에도 올리지 않는다
+tools/
+진단/
+내려받기/
+.claude/
+*_정리본*.xlsx
+*_바꾼기록*.xlsx
+_test*.html

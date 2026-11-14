@@ -1,0 +1,12 @@
+# 배포에는 올리지 않는다 (저장소에만 올리는 것 + 어디에도 올리지 않는 것)
+CLAUDE.md
+README.md
+.gitignore
+.vercelignore
+tools/
+진단/
+내려받기/
+.claude/
+*_정리본*.xlsx
+*_바꾼기록*.xlsx
+_test*.html
